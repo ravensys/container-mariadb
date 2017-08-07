@@ -11,6 +11,8 @@ Versions
 
 MariaDB versions provided:
 
+* [MariaDB 5.5](5.5)
+* [MariaDB 10.0](10.0)
 * [MariaDB 10.1](10.1)
 * [MariaDB 10.2](10.2)
 
@@ -43,6 +45,10 @@ For using other versions of MariaDB just replace `10.2` value by particular vers
 
 Usage
 -----
+
+For information about usage of Dockerfile for MariaDB 5.5 see [usage documentation](5.5).
+
+For information about usage of Dockerfile for MariaDB 10.0 see [usage documentation](10.0).
 
 For information about usage of Dockerfile for MariaDB 10.1 see [usage documentation](10.1).
 
