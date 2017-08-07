@@ -1,0 +1,38 @@
+#!/bin/bash
+
+source "${CONTAINER_ENTRYPOINT_PATH}/common.sh"
+source "${CONTAINER_ENTRYPOINT_PATH}/mariadb/common.sh"
+set -o errexit
+set -o nounset
+
+mariadb_export_config_variables
+
+if [ -f "${CONTAINER_ENTRYPOINT_PATH}/mariadb/validate-variables.sh" ]; then
+    log_message "Running environment variables validations ..."
+    source "${CONTAINER_ENTRYPOINT_PATH}/mariadb/validate-variables.sh"
+fi
+
+log_message "Processing MariaDB configuration files ..."
+mariadb_generate_config
+
+if ! mariadb_is_initialized; then
+    log_message "MariaDB is not initialized. Running MariaDB initialization process ..."
+    mariadb_initialize
+
+    if [ -d "${CONTAINER_ENTRYPOINT_PATH}/mariadb/post-init.d" ]; then
+        log_message "Sourcing post-initialization scripts ..."
+        source_scripts "${CONTAINER_ENTRYPOINT_PATH}/mariadb/post-init.d"
+    fi
+else
+    mariadb_start_local
+fi
+
+if [ -f "${CONTAINER_ENTRYPOINT_PATH}/mariadb/update-passwords.sh" ]; then
+    log_message "Updating passwords ..."
+    source "${CONTAINER_ENTRYPOINT_PATH}/mariadb/update-passwords.sh"
+fi
+
+mariadb_stop_local
+mariadb_cleanup_environment
+log_message "Running final exec -- Only MariaDB server logs after this point"
+exec mysqld --datadir="${MARIADB_DATADIR}" "$@"

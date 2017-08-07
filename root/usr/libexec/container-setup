@@ -1,0 +1,34 @@
+#!/bin/bash
+
+MARIADB_CONFIG=/etc/my.cnf
+MARIADB_DATADIR=/var/lib/mysql/data
+
+function mariadb_create_dir() {
+    local dir="$1"; shift
+
+    mkdir -p "${dir}"
+    chown mysql:0 "${dir}"
+    chmod 0700 "${dir}"
+}
+
+
+mariadb_create_dir "${MARIADB_CONFIG}.d"
+rm -f "${MARIADB_CONFIG}.d"/*
+
+cat > "${MARIADB_CONFIG}" <<EOCONF
+[mysqld]
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links = 0
+
+# http://www.percona.com/blog/2008/05/31/dns-achilles-heel-mysql-installation/
+skip_name_resolve
+
+!includedir ${MARIADB_CONFIG}.d
+EOCONF
+
+mariadb_create_dir "${MARIADB_DATADIR}"
+
+unset MARIADB_CONFIG
+unset MARIADB_DATADIR
+unset mariadb_create_dir
