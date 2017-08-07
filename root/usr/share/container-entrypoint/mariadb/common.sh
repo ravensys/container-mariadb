@@ -47,7 +47,7 @@ function mariadb_create_database_if_not_exists() {
     local database="$1"; shift
 
     mariadb_cmd <<EOSQL
-CREATE DATABASE \`${database}\`;
+CREATE DATABASE IF NOT EXISTS \`${database}\`;
 EOSQL
 }
 
